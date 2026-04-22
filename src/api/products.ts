@@ -8,6 +8,9 @@ export const productsApi = {
   getBySlug: (slug: string) =>
     apiClient.get<ApiResponse<Product>>(`/products/${slug}`),
 
+  getCategories: () =>
+    apiClient.get<ApiResponse<string[]>>('/products/categories'),
+
   getById: (id: string) =>
     apiClient.get<ApiResponse<Product>>(`/products/id/${id}`),
 

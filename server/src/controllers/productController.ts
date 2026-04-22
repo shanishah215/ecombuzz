@@ -66,4 +66,11 @@ export const productController = {
       successResponse(res, null, 'Product deleted')
     } catch (err) { next(err) }
   },
+
+  async getCategories(req: Request, res: Response, next: NextFunction) {
+    try {
+      const categories = await productService.getCategories()
+      successResponse(res, categories, 'Categories fetched')
+    } catch (err) { next(err) }
+  },
 }

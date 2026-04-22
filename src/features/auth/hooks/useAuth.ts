@@ -11,7 +11,7 @@ export function useLogin() {
   const { setAuth } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/'
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/home'
 
   async function login(payload: LoginPayload) {
     setIsLoading(true)
@@ -44,7 +44,7 @@ export function useRegister() {
       localStorage.setItem('accessToken', data.data.accessToken)
       setAuth(data.data.user, data.data.accessToken)
       toast.success('Account created successfully!')
-      navigate('/')
+      navigate('/home')
     } catch (err) {
       console.error('[Register error]', err)
       toast.error(getErrorMessage(err))

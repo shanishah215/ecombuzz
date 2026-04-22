@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SlidersHorizontal, X } from 'lucide-react'
-import { useProducts } from '@/features/products/hooks/useProducts'
-import { useDebounce } from '@/hooks/useDebounce'
+import { useProducts, useCategories } from '@/features/products/hooks/useProducts'
 import ProductCard from '@/features/products/components/ProductCard'
 import { ProductCardSkeleton } from '@/components/ui/Skeleton'
 import Button from '@/components/ui/Button'
@@ -16,13 +15,10 @@ const SORT_OPTIONS = [
   { label: 'Top Rated', value: 'rating' },
 ]
 
-const CATEGORIES = ['electronics', 'fashion', 'home', 'beauty', 'sports', 'books']
-
 export default function ProductListPage() {
   const [searchParams] = useSearchParams()
   const [showFilters, setShowFilters] = useState(false)
-  const [search, setSearch] = useState(searchParams.get('search') ?? '')
-  const debouncedSearch = useDebounce(search, 400)
+  const querySearch = searchParams.get('search') ?? ''
 
   const [filters, setFilters] = useState<ProductFilters>({
     category: searchParams.get('category') ?? undefined,
@@ -30,11 +26,17 @@ export default function ProductListPage() {
     page: 1,
   })
 
-  const { data, isLoading } = useProducts({ ...filters, search: debouncedSearch || undefined })
+  const { data, isLoading } = useProducts({ ...filters, search: querySearch || undefined })
+  const { categories, isLoading: categoriesLoading } = useCategories()
 
+  // Sync URL params to local state when navigating (e.g. navbar search, homepage category links)
   useEffect(() => {
-    setFilters((f) => ({ ...f, page: 1 }))
-  }, [debouncedSearch])
+    setFilters({
+      category: searchParams.get('category') ?? undefined,
+      sort: (searchParams.get('sort') ?? '') as ProductFilters['sort'],
+      page: 1,
+    })
+  }, [searchParams])
 
   function setFilter(key: keyof ProductFilters, value: unknown) {
     setFilters((f) => ({ ...f, [key]: value || undefined, page: 1 }))
@@ -43,30 +45,33 @@ export default function ProductListPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-4">
       {/* Top bar */}
-      <div className="bg-white shadow-sm rounded-sm px-4 py-3 flex flex-wrap items-center gap-3 mb-4">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search products…"
-          className="flex-1 min-w-[200px] border border-gray-200 rounded px-3 py-1.5 text-sm outline-none focus:border-[#2874f0]"
-        />
-        <select
-          value={filters.sort ?? ''}
-          onChange={(e) => setFilter('sort', e.target.value)}
-          className="border border-gray-200 rounded px-2 py-1.5 text-sm outline-none focus:border-[#2874f0]"
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowFilters((v) => !v)}
-          className="sm:hidden flex items-center gap-1"
-        >
-          <SlidersHorizontal size={14} /> Filters
-        </Button>
+      <div className="bg-white shadow-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          {querySearch && (
+            <h1 className="text-lg font-medium text-gray-800">
+              Results for "<span className="text-[#2874f0]">{querySearch}</span>"
+            </h1>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={filters.sort ?? ''}
+            onChange={(e) => setFilter('sort', e.target.value)}
+            className="border border-gray-200 rounded px-2 py-1.5 text-sm outline-none focus:border-[#2874f0]"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters((v) => !v)}
+            className="sm:hidden flex items-center gap-1"
+          >
+            <SlidersHorizontal size={14} /> Filters
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-4">
@@ -83,18 +88,24 @@ export default function ProductListPage() {
             {/* Category */}
             <div className="mb-4">
               <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Category</p>
-              {CATEGORIES.map((cat) => (
-                <label key={cat} className="flex items-center gap-2 py-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={filters.category === cat}
-                    onChange={() => setFilter('category', cat)}
-                    className="accent-[#2874f0]"
-                  />
-                  <span className="text-sm capitalize text-gray-700">{cat}</span>
-                </label>
-              ))}
+              {categoriesLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map((i) => <div key={i} className="h-4 bg-gray-50 animate-pulse rounded" />)}
+                </div>
+              ) : (
+                categories.map((cat) => (
+                  <label key={cat} className="flex items-center gap-2 py-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={filters.category === cat}
+                      onChange={() => setFilter('category', cat)}
+                      className="accent-[#2874f0]"
+                    />
+                    <span className="text-sm capitalize text-gray-700">{cat}</span>
+                  </label>
+                ))
+              )}
               {filters.category && (
                 <button onClick={() => setFilter('category', '')} className="text-xs text-[#2874f0] mt-1">
                   Clear

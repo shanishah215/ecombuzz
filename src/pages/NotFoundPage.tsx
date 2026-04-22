@@ -9,7 +9,7 @@ export default function NotFoundPage() {
       <p className="text-gray-500 text-sm max-w-sm">
         The page you're looking for doesn't exist or has been moved.
       </p>
-      <Link to="/">
+      <Link to="/home">
         <Button size="lg">Go to Homepage</Button>
       </Link>
     </div>

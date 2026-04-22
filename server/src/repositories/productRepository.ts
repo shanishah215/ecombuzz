@@ -16,7 +16,15 @@ export class ProductRepository {
       }
     }
     if (rating) query.rating = { $gte: rating }
-    if (search) query.$text = { $search: search }
+    if (search) {
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      query.$or = [
+        { name: { $regex: safeSearch, $options: 'i' } },
+        { brand: { $regex: safeSearch, $options: 'i' } },
+        { category: { $regex: safeSearch, $options: 'i' } },
+        { tags: { $regex: safeSearch, $options: 'i' } },
+      ]
+    }
 
     const sortMap: Record<string, Record<string, SortOrder>> = {
       price_asc: { price: 1 },
@@ -56,5 +64,10 @@ export class ProductRepository {
 
   delete(id: string) {
     return Product.findByIdAndDelete(id)
+  }
+
+  async findCategories() {
+    const categories = await Product.distinct('category', { isActive: true })
+    return categories.sort()
   }
 }

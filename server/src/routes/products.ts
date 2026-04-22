@@ -26,6 +26,9 @@ const updateSchema = productSchema.partial()
 // GET /api/products?category=&brand=&minPrice=&maxPrice=&rating=&search=&sort=&page=&limit=
 router.get('/', productController.getAll)
 
+// GET /api/products/categories
+router.get('/categories', productController.getCategories)
+
 // GET /api/products/id/:id  (used internally / admin)
 router.get('/id/:id', productController.getById)
 

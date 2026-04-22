@@ -1,21 +1,28 @@
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
-import { useProducts } from '@/features/products/hooks/useProducts'
+import { useProducts, useCategories } from '@/features/products/hooks/useProducts'
 import ProductCard from '@/features/products/components/ProductCard'
 import { ProductCardSkeleton } from '@/components/ui/Skeleton'
 
-const CATEGORIES = [
-  { label: 'Electronics', icon: '💻', value: 'electronics' },
-  { label: 'Fashion', icon: '👗', value: 'fashion' },
-  { label: 'Home', icon: '🏠', value: 'home' },
-  { label: 'Beauty', icon: '💄', value: 'beauty' },
-  { label: 'Sports', icon: '⚽', value: 'sports' },
-  { label: 'Books', icon: '📚', value: 'books' },
-]
+const CATEGORY_MAP: Record<string, { label: string; icon: string }> = {
+  mobiles: { label: 'Mobiles', icon: '📱' },
+  laptops: { label: 'Laptops', icon: '💻' },
+  tvs: { label: 'TVs', icon: '📺' },
+  headphones: { label: 'Headphones', icon: '🎧' },
+  cameras: { label: 'Cameras', icon: '📷' },
+  tablets: { label: 'Tablets', icon: '📲' },
+  electronics: { label: 'Electronics', icon: '⚡' },
+  fashion: { label: 'Fashion', icon: '👗' },
+  home: { label: 'Home', icon: '🏠' },
+  beauty: { label: 'Beauty', icon: '💄' },
+  sports: { label: 'Sports', icon: '⚽' },
+  books: { label: 'Books', icon: '📚' },
+}
 
 export default function HomePage() {
   const { data, isLoading } = useProducts({ limit: 8, sort: 'newest' })
   const { data: topRated, isLoading: topLoading } = useProducts({ limit: 8, sort: 'rating' })
+  const { categories, isLoading: categoriesLoading } = useCategories()
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-4">
@@ -47,16 +54,23 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat.value}
-              to={`/products?category=${cat.value}`}
-              className="flex flex-col items-center gap-2 p-3 rounded hover:bg-blue-50 transition"
-            >
-              <span className="text-3xl">{cat.icon}</span>
-              <span className="text-xs text-gray-700 font-medium text-center">{cat.label}</span>
-            </Link>
-          ))}
+          {categoriesLoading
+            ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-20 bg-gray-50 animate-pulse rounded" />
+            ))
+            : categories.map((cat) => {
+              const config = CATEGORY_MAP[cat.toLowerCase()] || { label: cat, icon: '📦' }
+              return (
+                <Link
+                  key={cat}
+                  to={`/products?category=${cat}`}
+                  className="flex flex-col items-center gap-2 p-3 rounded hover:bg-blue-50 transition"
+                >
+                  <span className="text-3xl">{config.icon}</span>
+                  <span className="text-xs text-gray-700 font-medium text-center">{config.label}</span>
+                </Link>
+              )
+            })}
         </div>
       </section>
 

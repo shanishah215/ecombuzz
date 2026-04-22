@@ -5,6 +5,7 @@ import AdminLayout from '@/components/layout/AdminLayout'
 import PageLoader from '@/components/ui/PageLoader'
 import ProtectedRoute from '@/components/shared/ProtectedRoute'
 import AdminRoute from '@/components/shared/AdminRoute'
+import GuestRoute from '@/components/shared/GuestRoute'
 
 // Lazy-loaded pages
 const HomePage = lazy(() => import('@/pages/HomePage'))
@@ -35,15 +36,21 @@ export const router = createBrowserRouter([
     path: '/',
     element: <MainLayout />,
     children: [
-      { index: true, element: wrap(<HomePage />) },
-      { path: 'products', element: wrap(<ProductListPage />) },
-      { path: 'products/:slug', element: wrap(<ProductDetailPage />) },
-      { path: 'cart', element: wrap(<CartPage />) },
-      { path: 'login', element: wrap(<LoginPage />) },
-      { path: 'register', element: wrap(<RegisterPage />) },
+      { index: true, element: <Navigate to="/home" replace /> },
+      {
+        element: <GuestRoute />,
+        children: [
+          { path: 'login', element: wrap(<LoginPage />) },
+          { path: 'register', element: wrap(<RegisterPage />) },
+        ],
+      },
       {
         element: <ProtectedRoute />,
         children: [
+          { path: 'home', element: wrap(<HomePage />) },
+          { path: 'products', element: wrap(<ProductListPage />) },
+          { path: 'products/:slug', element: wrap(<ProductDetailPage />) },
+          { path: 'cart', element: wrap(<CartPage />) },
           { path: 'wishlist', element: wrap(<WishlistPage />) },
           { path: 'checkout', element: wrap(<CheckoutPage />) },
           { path: 'orders', element: wrap(<OrdersPage />) },

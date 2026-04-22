@@ -11,7 +11,7 @@ function AppContent() {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 3000,
+          duration: 1000,
           style: { fontSize: '14px' },
           success: { iconTheme: { primary: '#388e3c', secondary: '#fff' } },
           error: { iconTheme: { primary: '#ff6161', secondary: '#fff' } },

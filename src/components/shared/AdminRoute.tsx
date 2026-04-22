@@ -7,6 +7,6 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
   const { user, isAuthenticated, isLoading } = useAuthStore()
 
   if (isLoading) return <PageLoader />
-  if (!isAuthenticated || user?.role !== 'admin') return <Navigate to="/" replace />
+  if (!isAuthenticated || user?.role !== 'admin') return <Navigate to="/login" replace />
   return <>{children}</>
 }

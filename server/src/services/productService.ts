@@ -79,4 +79,14 @@ export const productService = {
     await cacheDel(detailKey(product.slug))
     return product
   },
+
+  async getCategories() {
+    const key = 'products:categories'
+    const cached = await cacheGet(key)
+    if (cached) return cached
+
+    const categories = await repo.findCategories()
+    await cacheSet(key, categories, 3600) // Cache for 1 hour
+    return categories
+  },
 }

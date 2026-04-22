@@ -1,30 +1,28 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { productsApi } from '@/api/products'
 import type { Product, ProductFilters, PaginatedProducts } from '@/types'
 import { getErrorMessage } from '@/lib/utils'
 
-export function useProducts(initialFilters: ProductFilters = {}) {
+export function useProducts(filters: ProductFilters = {}) {
   const [data, setData] = useState<PaginatedProducts | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filters, setFilters] = useState<ProductFilters>(initialFilters)
 
-  const fetch = useCallback(async (f: ProductFilters) => {
+  const { category, brand, minPrice, maxPrice, rating, search, sort, page, limit } = filters
+
+  useEffect(() => {
+    let cancelled = false
     setIsLoading(true)
     setError(null)
-    try {
-      const res = await productsApi.getAll(f)
-      setData(res.data.data)
-    } catch (err) {
-      setError(getErrorMessage(err))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+    productsApi
+      .getAll({ category, brand, minPrice, maxPrice, rating, search, sort, page, limit })
+      .then((res) => { if (!cancelled) setData(res.data.data) })
+      .catch((err) => { if (!cancelled) setError(getErrorMessage(err)) })
+      .finally(() => { if (!cancelled) setIsLoading(false) })
+    return () => { cancelled = true }
+  }, [category, brand, minPrice, maxPrice, rating, search, sort, page, limit])
 
-  useEffect(() => { fetch(filters) }, [filters, fetch])
-
-  return { data, isLoading, error, filters, setFilters }
+  return { data, isLoading, error }
 }
 
 export function useProduct(slug: string) {
@@ -43,4 +41,19 @@ export function useProduct(slug: string) {
   }, [slug])
 
   return { product, isLoading, error }
+}
+
+export function useCategories() {
+  const [categories, setCategories] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    productsApi
+      .getCategories()
+      .then((res) => setCategories(res.data.data))
+      .catch(() => {})
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  return { categories, isLoading }
 }
