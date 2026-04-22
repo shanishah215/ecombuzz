@@ -1,4 +1,5 @@
 import { ProductRepository } from '@/repositories/productRepository'
+import { categoryService } from '@/services/categoryService'
 import { cacheGet, cacheSet, cacheDel } from '@/config/redis'
 import { AppError } from '@/middleware/errorHandler'
 import type { ProductFilters } from '@/repositories/types'
@@ -85,8 +86,14 @@ export const productService = {
     const cached = await cacheGet(key)
     if (cached) return cached
 
-    const categories = await repo.findCategories()
-    await cacheSet(key, categories, 3600) // Cache for 1 hour
-    return categories
+    let categories = await categoryService.getAll()
+    let categoryNames = categories.map(c => c.name)
+
+    if (categoryNames.length === 0) {
+      categoryNames = await repo.findCategories()
+    }
+
+    await cacheSet(key, categoryNames, 3600)
+    return categoryNames
   },
 }

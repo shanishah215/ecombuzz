@@ -67,7 +67,10 @@ export class ProductRepository {
   }
 
   async findCategories() {
-    const categories = await Product.distinct('category', { isActive: true })
+    const categories = await Product.distinct('category', { 
+      isActive: { $ne: false },
+      category: { $ne: '', $exists: true }
+    })
     return categories.sort()
   }
 }

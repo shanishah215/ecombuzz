@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingBag, Users } from 'lucide-react'
+import { LayoutDashboard, Package, Tag, ShoppingBag, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const nav = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/admin/products', label: 'Products', icon: Package },
+  { to: '/admin/categories', label: 'Categories', icon: Tag },
   { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { to: '/admin/users', label: 'Users', icon: Users },
 ]

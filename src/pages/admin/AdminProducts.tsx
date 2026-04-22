@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Pencil, Trash2, PlusCircle } from 'lucide-react'
 import { productsApi } from '@/api/products'
+import { categoriesApi } from '@/api/categories'
+import { useCategories } from '@/features/products/hooks/useProducts'
 import { formatPrice, getErrorMessage } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -22,6 +25,7 @@ export default function AdminProducts() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const { categories } = useCategories()
 
   function load(p = 1) {
     setIsLoading(true)
@@ -82,9 +86,16 @@ export default function AdminProducts() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-gray-800">Products <span className="text-sm font-normal text-gray-400">({total})</span></h1>
-        <Button size="sm" onClick={openCreate} className="flex items-center gap-1">
-          <PlusCircle size={15} /> Add Product
-        </Button>
+        <div className="flex gap-2">
+          <Link to="/admin/categories">
+            <Button variant="outline" size="sm" className="flex items-center gap-1">
+              Manage Categories
+            </Button>
+          </Link>
+          <Button size="sm" onClick={openCreate} className="flex items-center gap-1">
+            <PlusCircle size={15} /> Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Product form modal */}
@@ -94,7 +105,21 @@ export default function AdminProducts() {
             <h2 className="text-lg font-semibold">{editingId ? 'Edit Product' : 'Add Product'}</h2>
             <div className="grid grid-cols-2 gap-3">
               <Input label="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="col-span-2" />
-              <Input label="Category" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} />
+              
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">Category</label>
+                <select 
+                  value={form.category} 
+                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-sm px-3 py-2 text-sm outline-none focus:border-[#2874f0]"
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
               <Input label="Brand" value={form.brand} onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))} />
               <Input label="Price (₹)" type="number" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} />
               <Input label="Original Price (₹)" type="number" value={form.originalPrice} onChange={(e) => setForm((f) => ({ ...f, originalPrice: e.target.value }))} />
