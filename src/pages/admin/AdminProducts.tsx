@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash2, PlusCircle } from 'lucide-react'
 import { productsApi } from '@/api/products'
-import { categoriesApi } from '@/api/categories'
 import { useCategories } from '@/features/products/hooks/useProducts'
 import { formatPrice, getErrorMessage } from '@/lib/utils'
 import Button from '@/components/ui/Button'
@@ -105,11 +104,11 @@ export default function AdminProducts() {
             <h2 className="text-lg font-semibold">{editingId ? 'Edit Product' : 'Add Product'}</h2>
             <div className="grid grid-cols-2 gap-3">
               <Input label="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="col-span-2" />
-              
+
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-gray-700">Category</label>
-                <select 
-                  value={form.category} 
+                <select
+                  value={form.category}
                   onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                   className="w-full border border-gray-300 rounded-sm px-3 py-2 text-sm outline-none focus:border-[#2874f0]"
                 >
