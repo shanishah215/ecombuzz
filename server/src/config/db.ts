@@ -4,5 +4,5 @@ import { env } from './env'
 export async function connectDB() {
   mongoose.connection.on('connected', () => console.log('MongoDB connected'))
   mongoose.connection.on('error', (err) => console.error('MongoDB error:', err))
-  await mongoose.connect(env.MONGO_URI)
+  await mongoose.connect(env.MONGO_URI, { serverSelectionTimeoutMS: 10000 })
 }
