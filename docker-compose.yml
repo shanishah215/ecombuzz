@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: ecombuzz_mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: ecombuzz
+    networks:
+      - ecombuzz_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: ecombuzz_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - ecombuzz_net
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ecombuzz_server
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - ./server/.env
+    environment:
+      MONGO_URI: mongodb://mongo:27017/ecombuzz
+      REDIS_URL: redis://redis:6379
+      CLIENT_URL: http://localhost
+    ports:
+      - '5000:5000'
+    networks:
+      - ecombuzz_net
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecombuzz_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - '80:80'
+    networks:
+      - ecombuzz_net
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  ecombuzz_net:
+    driver: bridge

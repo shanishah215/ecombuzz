@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: #2874f0;
+    --color-primary-dark: #1a5dc8;
+    --color-secondary: #fb641b;
+    --color-success: #388e3c;
+    --color-warning: #ff9f00;
+    --color-danger: #ff6161;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background-color: #f1f3f6;
+    color: #212121;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
