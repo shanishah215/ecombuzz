@@ -13,13 +13,13 @@ const variantClasses = {
   outline: 'border border-[#2874f0] text-[#2874f0] hover:bg-blue-50',
   ghost: 'text-gray-600 hover:bg-gray-100',
   danger: 'bg-red-500 hover:bg-red-600 text-white',
-}
+} as const
 
 const sizeClasses = {
   sm: 'px-3 py-1.5 text-xs',
   md: 'px-4 py-2 text-sm',
   lg: 'px-6 py-3 text-base',
-}
+} as const
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', isLoading, className, children, disabled, ...props }, ref) => (
